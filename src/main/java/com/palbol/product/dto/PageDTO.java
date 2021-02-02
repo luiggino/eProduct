@@ -12,5 +12,6 @@ import lombok.Setter;
 public class PageDTO {
     private Integer pageNo;
     private Integer pageSize;
-    private String sortBy;
+    private SortDTO sortBy;
+    private String search;
 }

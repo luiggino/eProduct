@@ -1,27 +1,59 @@
 package com.palbol.product.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.math.BigDecimal;
 
+@Data
 @Entity
-@Table(name = "pb_product")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@ToString
+/*
+@NamedStoredProcedureQuery(name = "getProductList", procedureName = "getProductList", resultClasses = {
+        ProductDomain.class}, parameters = {})*/
 public class ProductDomain implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private Long id_product;
 
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "description")
     private String description;
-    private BigDecimal price;
-    private String imageUrl;
+
+    @Column(name = "color")
+    private String color;
+
+    @Column(name = "size")
+    private String size;
+
+    @Column(name = "category_id")
+    private Integer categoryId;
+
+    @Column(name = "ratings_count")
+    private Integer ratingsCount;
+
+    @Column(name = "ratings_value")
+    private Integer ratingsValue;
+
+    @Column(name = "images")
+    private String images;
+
+    @Column(name = "count")
+    private Integer count;
+/*
+
+    private BigDecimal oldPrice;
+    private BigDecimal newPrice;
+    private BigDecimal discount;
+
+
+    private Integer availibilityCount;
+    private Integer cartCount;
+
+    private Integer weight;*/
+
 }

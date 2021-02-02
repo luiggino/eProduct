@@ -1,15 +1,16 @@
 package com.palbol.product.controllers;
 
+import com.palbol.product.dto.ListProductDTO;
 import com.palbol.product.dto.PageDTO;
 import com.palbol.product.dto.ProductDTO;
 import com.palbol.product.services.ProductService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Set;
-
 @RestController
+@Slf4j
 public class ProductController {
     private final ProductService productService;
 
@@ -18,12 +19,14 @@ public class ProductController {
     }
 
     @PostMapping("/findall")
-    public ResponseEntity<Set<ProductDTO>> findAll(@RequestBody PageDTO pageable) {
+    public ResponseEntity<ListProductDTO> findAll(@RequestBody PageDTO pageable) {
         try {
-            Set<ProductDTO> response = this.productService.listAll(pageable);
+            ListProductDTO response = this.productService.listAll(pageable);
 
+            log.debug(response.toString());
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

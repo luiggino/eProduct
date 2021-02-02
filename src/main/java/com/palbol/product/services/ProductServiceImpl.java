@@ -1,44 +1,63 @@
 package com.palbol.product.services;
 
 import com.palbol.product.domain.ProductDomain;
+import com.palbol.product.dto.ListProductDTO;
 import com.palbol.product.dto.PageDTO;
 import com.palbol.product.dto.ProductDTO;
 import com.palbol.product.repository.ProductRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class ProductServiceImpl implements ProductService {
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public ProductServiceImpl(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Set<ProductDTO> listAll(PageDTO pageDTO) {
-        Pageable pageable = PageRequest.of(pageDTO.getPageNo(),
-                pageDTO.getPageSize(),
-                Sort.by(pageDTO.getSortBy()));
-        Set<ProductDTO> products = new HashSet<>();
-        Page<ProductDomain> pagedResult = productRepository.findAll(pageable);
+    public ListProductDTO listAll(PageDTO pageDTO) {
+        log.info("listAll");
+        Pageable pageable = PageRequest.of(pageDTO.getPageNo() - 1,
+                pageDTO.getPageSize());
 
-        if (pagedResult.hasContent()) {
-            ModelMapper modelMapper = new ModelMapper();
-            return pagedResult.getContent()
-                    .stream()
-                    .map(productDomain -> modelMapper.map(productDomain, ProductDTO.class))
-                    .collect(Collectors.toSet());
-        }
-        return products;
+        List<ProductDomain> response = this.productRepository
+                .findAllBetweenStoredProcedure(
+                        pageable.getPageSize(),
+                        Long.valueOf(pageable.getOffset()).intValue(),
+                        pageDTO.getSortBy().getProperty(),
+                        pageDTO.getSortBy().getDirection().name());
+
+        ProductDomain firstProduct = response.stream().findFirst().orElse(null);
+        Integer count = firstProduct != null ? firstProduct.getCount() : 0;
+
+        ModelMapper modelMapper = new ModelMapper();
+        Set<ProductDTO> productDTOSet = response
+                .stream()
+                .map(productDomain -> modelMapper.map(productDomain, ProductDTO.class))
+                .collect(Collectors.toSet());
+
+        ListProductDTO listProductDTO = new ListProductDTO();
+        listProductDTO.setListProduct(productDTOSet);
+        listProductDTO.setCount(count);
+        listProductDTO.setCurrentPage(pageable.getPageSize());
+
+        return listProductDTO;
     }
 
     @Override

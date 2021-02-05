@@ -9,9 +9,6 @@ import java.io.Serializable;
 @Data
 @Entity
 @ToString
-/*
-@NamedStoredProcedureQuery(name = "getProductList", procedureName = "getProductList", resultClasses = {
-        ProductDomain.class}, parameters = {})*/
 public class ProductDomain implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -42,6 +39,9 @@ public class ProductDomain implements Serializable {
     @Column(name = "images")
     private String images;
 
+    @Column(name = "weight")
+    private Integer weight;
+
     @Column(name = "count")
     private Integer count;
 /*
@@ -54,6 +54,6 @@ public class ProductDomain implements Serializable {
     private Integer availibilityCount;
     private Integer cartCount;
 
-    private Integer weight;*/
+    */
 
 }

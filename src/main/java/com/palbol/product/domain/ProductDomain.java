@@ -42,18 +42,18 @@ public class ProductDomain implements Serializable {
     @Column(name = "weight")
     private Integer weight;
 
-    @Column(name = "count")
-    private Integer count;
-/*
+    @Column(name = "oldPrice")
+    private Integer oldPrice;
 
-    private BigDecimal oldPrice;
-    private BigDecimal newPrice;
-    private BigDecimal discount;
+    @Column(name = "newPrice")
+    private Integer newPrice;
 
-
+    @Column(name = "availibilityCount")
     private Integer availibilityCount;
+
+    @Column(name = "cartCount")
     private Integer cartCount;
 
-    */
-
+    @Column(name = "count")
+    private Integer count;
 }

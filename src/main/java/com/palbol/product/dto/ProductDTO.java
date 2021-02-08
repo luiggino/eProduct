@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @NoArgsConstructor
@@ -19,11 +18,11 @@ public class ProductDTO {
     @JsonProperty("images")
     private List<ImageDTO> images;
     @JsonProperty("oldPrice")
-    private BigDecimal oldPrice;
+    private Integer oldPrice;
     @JsonProperty("newPrice")
-    private BigDecimal newPrice;
+    private Integer newPrice;
     @JsonProperty("discount")
-    private BigDecimal discount;
+    private Integer discount;
     @JsonProperty("ratingsCount")
     private Integer ratingsCount;
     @JsonProperty("ratingsValue")

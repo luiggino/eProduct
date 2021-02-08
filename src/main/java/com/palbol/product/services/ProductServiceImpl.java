@@ -14,8 +14,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -60,6 +58,7 @@ public class ProductServiceImpl implements ProductService {
                     productDTO.setImages(listImageDTO);
                     productDTO.setColor(listColor);
                     productDTO.setSize(listSize);
+                    productDTO.setDiscount(productDomain.getNewPrice() - productDomain.getOldPrice());
                     return productDTO;
                 })
                 .collect(Collectors.toSet());

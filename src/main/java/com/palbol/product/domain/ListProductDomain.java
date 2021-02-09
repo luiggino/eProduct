@@ -1,7 +1,6 @@
 package com.palbol.product.domain;
 
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -9,9 +8,12 @@ import java.io.Serializable;
 @Data
 @Entity
 @ToString
-public class ProductDomain implements Serializable {
+public class ListProductDomain implements Serializable {
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     private static final long serialVersionUID = 1L;
     @Id
+    @Column
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id_product;
 

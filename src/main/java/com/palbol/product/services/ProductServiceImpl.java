@@ -2,7 +2,7 @@ package com.palbol.product.services;
 
 import com.palbol.product.domain.ImageDomain;
 import com.palbol.product.domain.ImageType;
-import com.palbol.product.domain.ProductDomain;
+import com.palbol.product.domain.ListProductDomain;
 import com.palbol.product.dto.ImageDTO;
 import com.palbol.product.dto.ListProductDTO;
 import com.palbol.product.dto.PageDTO;
@@ -14,7 +14,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,46 +33,33 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ListProductDTO listAll(PageDTO pageDTO) {
         log.info("listAll");
+
         Pageable pageable = PageRequest.of(pageDTO.getPageNo() - 1,
                 pageDTO.getPageSize());
 
-        List<ProductDomain> response = this.productRepository
-                .findAllBetweenStoredProcedure(
-                        pageable.getPageSize(),
-                        Long.valueOf(pageable.getOffset()).intValue(),
-                        pageDTO.getSortBy().getProperty(),
-                        pageDTO.getSortBy().getDirection().name());
+        List<ListProductDomain> response = new ArrayList<>();
+        try {
+            response = this.productRepository
+                    .findAllBetweenStoredProcedure(
+                            pageable.getPageSize(),
+                            Long.valueOf(pageable.getOffset()).intValue(),
+                            pageDTO.getSortBy().getProperty(),
+                            pageDTO.getSortBy().getDirection().name());
 
-        ProductDomain firstProduct = response.stream().findFirst().orElse(null);
+        } catch (Exception err) {
+            log.error(err.getMessage(), err);
+        }
+
+        ListProductDomain firstProduct = response.stream().findFirst().orElse(null);
         Integer count = firstProduct != null ? firstProduct.getCount() : 0;
 
         ModelMapper modelMapper = new ModelMapper();
         Set<ProductDTO> productDTOSet = response
                 .stream()
                 .map(productDomain -> {
-                    List<ImageDomain> listImageDomain = getListImageDomain(productDomain);
-                    List<ImageDTO> listImageDTO = this.getListImageDTO(listImageDomain);
-                    List<String> listColor = this.getListColor(productDomain);
-                    List<String> listSize = this.getListSize(productDomain);
-
                     ProductDTO productDTO = modelMapper.map(productDomain, ProductDTO.class);
-                    productDTO.setImages(listImageDTO);
-                    productDTO.setColor(listColor);
-                    productDTO.setSize(listSize);
 
-                    int newPrice = 0;
-                    if (productDomain.getNewPrice() != null && !productDomain.getNewPrice().isEmpty()) {
-                        newPrice = Integer.valueOf(productDomain.getNewPrice());
-                    }
-
-                    int oldPrice = 0;
-                    if (productDomain.getOldPrice() != null && !productDomain.getOldPrice().isEmpty()) {
-                        oldPrice = Integer.valueOf(productDomain.getOldPrice());
-                    }
-
-                    int discount = newPrice - oldPrice;
-                    productDTO.setDiscount(discount);
-                    return productDTO;
+                    return convertToProductDTO(productDomain, productDTO);
                 })
                 .collect(Collectors.toSet());
 
@@ -83,19 +73,52 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDTO getById(Long id) {
-        ProductDomain productDomain = productRepository.findById(id).orElse(null);
-        if (productDomain != null) {
+        log.info("getById " + id);
+        try {
+            ListProductDomain productDomain = productRepository.findByStoredProcedure(id.intValue());
+
             ModelMapper modelMapper = new ModelMapper();
-            return modelMapper.map(productDomain, ProductDTO.class);
+            ProductDTO productDTO = modelMapper.map(productDomain, ProductDTO.class);
+
+            return convertToProductDTO(productDomain, productDTO);
+        } catch (Exception err) {
+            log.error(err.getMessage(), err);
         }
+
         return null;
     }
 
-    private List<ImageDomain> getListImageDomain(ProductDomain productDomain) {
-        if (productDomain.getImages() == null || productDomain.getImages().isEmpty()) {
+    private ProductDTO convertToProductDTO(ListProductDomain productDomain, ProductDTO productDTO) {
+        List<ImageDomain> listImageDomain = getListImageDomain(productDomain.getImages());
+        List<ImageDTO> listImageDTO = this.getListImageDTO(listImageDomain);
+        List<String> listColor = this.getListColor(productDomain.getColor());
+        List<String> listSize = this.getListSize(productDomain.getSize());
+
+        productDTO.setImages(listImageDTO);
+        productDTO.setColor(listColor);
+        productDTO.setSize(listSize);
+
+        int newPrice = 0;
+        if (productDomain.getNewPrice() != null && !productDomain.getNewPrice().isEmpty()) {
+            newPrice = Integer.parseInt(productDomain.getNewPrice());
+        }
+
+        int oldPrice = 0;
+        if (productDomain.getOldPrice() != null && !productDomain.getOldPrice().isEmpty()) {
+            oldPrice = Integer.parseInt(productDomain.getOldPrice());
+        }
+
+        int discount = newPrice - oldPrice;
+        productDTO.setDiscount(discount);
+
+        return productDTO;
+    }
+
+    private List<ImageDomain> getListImageDomain(String images) {
+        if (images == null || images.isEmpty()) {
             return new ArrayList<>();
         }
-        String[] split = productDomain.getImages().split(";");
+        String[] split = images.split(";");
 
         return Arrays.stream(split)
                 .map(x -> {
@@ -144,21 +167,21 @@ public class ProductServiceImpl implements ProductService {
                 }).collect(Collectors.toList());
     }
 
-    private List<String> getListColor(ProductDomain productDomain) {
-        if (productDomain.getColor() == null || productDomain.getColor().isEmpty()) {
+    private List<String> getListColor(String color) {
+        if (color == null || color.isEmpty()) {
             return new ArrayList<>();
         }
-        String[] split = productDomain.getColor().split(";");
+        String[] split = color.split(";");
         return Arrays.stream(split)
                 .filter(x -> !x.isEmpty())
                 .collect(Collectors.toList());
     }
 
-    private List<String> getListSize(ProductDomain productDomain) {
-        if (productDomain.getSize() == null || productDomain.getSize().isEmpty()) {
+    private List<String> getListSize(String size) {
+        if (size == null || size.isEmpty()) {
             return new ArrayList<>();
         }
-        String[] split = productDomain.getSize().split(";");
+        String[] split = size.split(";");
         return Arrays.stream(split)
                 .filter(x -> !x.isEmpty())
                 .collect(Collectors.toList());

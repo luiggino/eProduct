@@ -1,17 +1,15 @@
 package com.palbol.product.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
-@NoArgsConstructor
 @Data
 public class ProductDTO {
     @JsonProperty("id")
-    private Long id;
+    private Long id_product;
     @JsonProperty("name")
     private String name;
     @JsonProperty("images")
@@ -40,4 +38,10 @@ public class ProductDTO {
     private Integer weight;
     @JsonProperty("categoryId")
     private Integer categoryId;
+
+    public ProductDTO() {
+        images = new ArrayList<>();
+        color = new ArrayList<>();
+        size = new ArrayList<>();
+    }
 }

@@ -14,9 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,7 +56,19 @@ public class ProductServiceImpl implements ProductService {
                     productDTO.setImages(listImageDTO);
                     productDTO.setColor(listColor);
                     productDTO.setSize(listSize);
-                    productDTO.setDiscount(productDomain.getNewPrice() - productDomain.getOldPrice());
+
+                    int newPrice = 0;
+                    if (productDomain.getNewPrice() != null && !productDomain.getNewPrice().isEmpty()) {
+                        newPrice = Integer.valueOf(productDomain.getNewPrice());
+                    }
+
+                    int oldPrice = 0;
+                    if (productDomain.getOldPrice() != null && !productDomain.getOldPrice().isEmpty()) {
+                        oldPrice = Integer.valueOf(productDomain.getOldPrice());
+                    }
+
+                    int discount = newPrice - oldPrice;
+                    productDTO.setDiscount(discount);
                     return productDTO;
                 })
                 .collect(Collectors.toSet());
@@ -82,6 +92,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private List<ImageDomain> getListImageDomain(ProductDomain productDomain) {
+        if (productDomain.getImages() == null || productDomain.getImages().isEmpty()) {
+            return new ArrayList<>();
+        }
         String[] split = productDomain.getImages().split(";");
 
         return Arrays.stream(split)
@@ -132,6 +145,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private List<String> getListColor(ProductDomain productDomain) {
+        if (productDomain.getColor() == null || productDomain.getColor().isEmpty()) {
+            return new ArrayList<>();
+        }
         String[] split = productDomain.getColor().split(";");
         return Arrays.stream(split)
                 .filter(x -> !x.isEmpty())
@@ -139,6 +155,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private List<String> getListSize(ProductDomain productDomain) {
+        if (productDomain.getSize() == null || productDomain.getSize().isEmpty()) {
+            return new ArrayList<>();
+        }
         String[] split = productDomain.getSize().split(";");
         return Arrays.stream(split)
                 .filter(x -> !x.isEmpty())

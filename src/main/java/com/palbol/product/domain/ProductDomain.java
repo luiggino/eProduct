@@ -43,10 +43,10 @@ public class ProductDomain implements Serializable {
     private Integer weight;
 
     @Column(name = "oldPrice")
-    private Integer oldPrice;
+    private String oldPrice;
 
     @Column(name = "newPrice")
-    private Integer newPrice;
+    private String newPrice;
 
     @Column(name = "availibilityCount")
     private Integer availibilityCount;

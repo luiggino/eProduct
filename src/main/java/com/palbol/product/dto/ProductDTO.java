@@ -9,7 +9,6 @@ import java.util.List;
 
 @NoArgsConstructor
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProductDTO {
     @JsonProperty("id")
     private Long id;
@@ -18,9 +17,9 @@ public class ProductDTO {
     @JsonProperty("images")
     private List<ImageDTO> images;
     @JsonProperty("oldPrice")
-    private Integer oldPrice;
+    private String oldPrice;
     @JsonProperty("newPrice")
-    private Integer newPrice;
+    private String newPrice;
     @JsonProperty("discount")
     private Integer discount;
     @JsonProperty("ratingsCount")

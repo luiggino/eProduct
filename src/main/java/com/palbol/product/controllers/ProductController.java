@@ -4,12 +4,15 @@ import com.palbol.product.dto.ListProductDTO;
 import com.palbol.product.dto.PageDTO;
 import com.palbol.product.dto.ProductDTO;
 import com.palbol.product.services.ProductService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/v1/products")
+@Tag(name = "Product", description = "Apis de Products de la APP")
 @Slf4j
 public class ProductController {
     private final ProductService productService;

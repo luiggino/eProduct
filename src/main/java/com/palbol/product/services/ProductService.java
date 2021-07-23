@@ -101,17 +101,17 @@ public class ProductService {
         productDTO.setColor(listColor);
         productDTO.setSize(listSize);
 
-        int newPrice = 0;
+        var newPrice = 0;
         if (productDomain.getNewPrice() != null && !productDomain.getNewPrice().isEmpty()) {
             newPrice = Integer.parseInt(productDomain.getNewPrice());
         }
 
-        int oldPrice = 0;
+        var oldPrice = 0;
         if (productDomain.getOldPrice() != null && !productDomain.getOldPrice().isEmpty()) {
             oldPrice = Integer.parseInt(productDomain.getOldPrice());
         }
 
-        int discount = newPrice - oldPrice;
+        var discount = newPrice - oldPrice;
         productDTO.setDiscount(discount);
 
         return productDTO;
@@ -121,7 +121,7 @@ public class ProductService {
         if (images == null || images.isEmpty()) {
             return new ArrayList<>();
         }
-        String[] split = images.split(";");
+        var split = images.split(";");
 
         return Arrays.stream(split)
                 .map(x -> {
@@ -174,7 +174,7 @@ public class ProductService {
         if (color == null || color.isEmpty()) {
             return new ArrayList<>();
         }
-        String[] split = color.split(";");
+        var split = color.split(";");
         return Arrays.stream(split)
                 .filter(x -> !x.isEmpty())
                 .collect(Collectors.toList());
@@ -184,7 +184,7 @@ public class ProductService {
         if (size == null || size.isEmpty()) {
             return new ArrayList<>();
         }
-        String[] split = size.split(";");
+        var split = size.split(";");
         return Arrays.stream(split)
                 .filter(x -> !x.isEmpty())
                 .collect(Collectors.toList());
